@@ -38,7 +38,7 @@ The MyTimetable link is only used to figure out what modules you take and to fil
 <h3>Ensuring the URL is correct</h3>
 <p>You should check that all your modules are in the returned URL and add them manually if they're missing for some reason.<br>
 The string "%3B" is used as the list separator (HTML quoting for the ';' character).<br>
-also ensure that the lab settings are correct for the lab you're assigned to, they should be blank if you don't take the lab<br>
+also ensure that the lab settings are correct for the lab you're assigned to, these can be ignored if you don't take the module.<br>
 For csc368 it can be "morning" or "afternoon", for csc318 either "wednesday" or "friday".<br></p>
 
 <h3>Importing to Google Calender</h3>
