@@ -180,8 +180,10 @@ def module_search(module):
     return {"name": m["Name"], "id": m["Identity"], "category": m["CategoryTypeIdentity"]}
 
 
-def get_ical_for_modules(modules):
-    print("Generating ics for modules: " + ", ".join(modules))
+# List of modules to get
+# and flags to 
+def get_ical_for_modules(modules, csc368_lab_remove, cscs318_lab_remove):
+    print("Generating ics for modules: " + ", ".join(modules) + f" and removing csc368 lab /0{csc368_lab_remove} and csc318 lab /0{cscs318_lab_remove}")
     ot_modules = []
 
     for m in modules:
@@ -193,14 +195,14 @@ def get_ical_for_modules(modules):
 
     req_data = {"CategoryIdentities": [m["id"] for m in ot_modules], "ViewOptions": get_view_options()}
     print("Fetching events for modules:")
-    print(req_data)
+    #print(req_data)
     events = requests.post(BASE_URL + "categories/events/filter", json=req_data, headers=HEADERS)
     if events.status_code != 200:
         print(events.status_code)
         print(events.text)
         return events.text
 
-    print(events.text)
+    #print(events.text)
 
     timetable = events.json()
     ical = Calendar()
@@ -213,11 +215,11 @@ def get_ical_for_modules(modules):
                     and ev.begin == datetime.fromisoformat(event["StartDateTime"]), ical.events))) > 0:
                 print("Duplicate event! " + name + " at " + event["StartDateTime"])
                 continue
-            if "CSC318_A/PC Lab/01/02" in event["Name"]:
-                print("Ignoring friday lab")
+            if csc368_lab_remove and "CSC368_CSCM68_A/PC Lab/01/0" + csc368_lab_remove in event["Name"]:
+                print(f"Removing embedded lab /0{csc368_lab_remove}")
                 continue
-            if "CSC368_CSCM68_A/PC Lab/01/02" in event["Name"]:
-                print("Ignoring wednesday afternoon embedded lab")
+            if cscs318_lab_remove and "CSC318_A/PC Lab/01/0" + cscs318_lab_remove in event["Name"]:
+                print(f"Removing cryptography lab /0{cscs318_lab_remove}")
                 continue
             desc = event["Name"]
             if len(event["ExtraProperties"]) > 1:

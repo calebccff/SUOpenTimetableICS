@@ -37,6 +37,24 @@ Open Timetable uses for them.</p>
 <form action="/api/generate">
   <label for="ical">MyTimetable iCal link</label><br>
   <input type="text" id="ical" name="ical" value=""><br>
+  <!--
+  <p>CSC368 Embedded Lab time</p><br>
+  <label for="csc368_lab1">I don't take CSC368</label><br>
+  <input type="radio" id="csc368_lab1" name="csc368_lab" value="0">
+  <label for="csc368_lab1">Morning</label><br>
+  <input type="radio" id="csc368_lab1" name="csc368_lab" value="1">
+  <label for="csc368_lab1">Afternoon</label><br>
+  <input type="radio" id="csc368_lab1" name="csc368_lab" value="2">
+
+  <p>CSC318 Cryptography Lab time</p><br>
+  <label for="csc318_lab1">I don't take CSC318</label><br>
+  <input type="radio" id="csc318_lab1" name="csc318_lab" value="0">
+  <label for="csc318_lab1">Morning</label><br>
+  <input type="radio" id="csc318_lab1" name="csc318_lab" value="1">
+  <label for="csc318_lab1">Afternoon</label><br>
+  <input type="radio" id="csc318_lab1" name="csc318_lab" value="2">
+    -->
+
   <input type="submit" value="Submit">
 </form> 
 
@@ -73,26 +91,56 @@ def generate():
     if timetable.status_code != 200:
         return f"Failed to get timetable: {timetable.status_code}"
 
-    print(timetable.text)
+    #print(timetable.text)
     c = Calendar(timetable.text)
 
-    print(request.form)
-
     modules = []
+    csc368_lab = ""
+    csc318_lab = ""
+
     for ev in c.events:
-        m = ev.name.split("/")[0].upper()
+        name = ev.name.upper()
+        #print(name)
+        m = name.split("/")[0].upper()
         if m not in modules:
             modules.append(m)
+        if csc368_lab == "":
+            if "CSC368_CSCM68_A" in name and "PC LAB/01/01" in name:
+                print("Morning embedded lab!")
+                csc368_lab = "morning"
+            elif "CSC368_CSCM68_A" in name and "PC LAB/01/02" in name:
+                print("afternoon embedded lab!")
+                csc368_lab = "afternoon"
+        if csc318_lab == "":
+            if "CSC318_A/PC LAB/01/01" in name:
+                print("wednesday crypto lab!")
+                csc318_lab = "wednesday"
+            elif "CSC318_A/PC LAB/01/02" in name:
+                print("friday crypto lab!")
+                csc318_lab = "friday"
 
-    data = quote(';'.join(modules))
 
-    return(f"{request.url_root}api/ics?modules={data}")
+    modules = quote(';'.join(modules))
+
+    return(f"{request.url_root}api/ics?modules={modules}&csc368_lab={csc368_lab}"
+           f"&csc318_lab={csc318_lab}")
 
 @app.route('/api/ics', methods=['GET'])
 def ics():
+    if "modules" not in request.args.keys():
+        return "No modules specified"
     modules = request.args.get("modules")
+    csc368_lab_remove = csc318_lab_remove = None
 
-    return get_ical_for_modules(modules.split(";")).serialize()
+    # This are used to filter _out_. For CSC368 the morning lab is /01 and afternoon is /02.
+    # So we set to "2" to remove the /02 labs
+    if "csc368_lab" in request.args.keys():
+        csc368_lab_remove = "2" if request.args.get("csc368_lab").upper() == "MORNING" else "1"
+    if "csc318_lab" in request.args.keys():
+        csc318_lab_remove = "2" if request.args.get("csc318_lab").upper() == "WEDNESDAY" else "1"
+
+    return get_ical_for_modules(modules.split(";"),
+        csc368_lab_remove, csc318_lab_remove).serialize()
 
 
 # Disable caching
