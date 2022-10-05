@@ -91,11 +91,13 @@ PRs welcome!<br><p>
 # c0fafdf7-2aab-419e-a69b-bbb9e957303c/141c474f-bd21-8c56-60fe-dbf755ebe241/timetable.ics
 @app.route('/api/generate', methods=['GET'])
 def generate():
-    mytimetable_link = request.args.get('ical')
+    mytimetable_link = urlparse(request.args.get('ical')).path
+    if len(mytimetable_link) == 0:
+        return f"Invalid URL: \"{mytimetable_link}"
     print("Got link: " + mytimetable_link)
     url = ""
     try:
-        url = f"https://scientia-eu-v3-4-api-d1-04.azurewebsites.net{urlparse(mytimetable_link).path}"
+        url = f"https://scientia-eu-v3-4-api-d1-04.azurewebsites.net{mytimetable_link}"
     except Exception as e:
         print("Failed to parse URL!")
         return f"Invalid URL: \"{mytimetable_link}\""
@@ -113,7 +115,11 @@ def generate():
         return f"Failed to get timetable: {timetable.status_code}"
 
     #print(timetable.text)
-    c = Calendar(timetable.text)
+    c = None
+    try:
+        c = Calendar(timetable.text)
+    except Exception as e:
+        return "Couldn't parse iCal from MyTimetable, are you sure the link is correct?"
 
     modules = []
     csc368_lab = ""
