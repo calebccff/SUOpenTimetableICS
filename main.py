@@ -5,6 +5,11 @@ from ics import Calendar
 from urllib.parse import urlparse, quote
 from time import sleep
 from opentimetable import *
+from waitress import serve
+import logging
+import os
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 CORS(app)
@@ -100,4 +105,4 @@ def add_header(r):
     return r
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8001)
+    serve(app, host='0.0.0.0', port=5000, url_scheme=os.environ.get('URL_SCHEME') or 'http')

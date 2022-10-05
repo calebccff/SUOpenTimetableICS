@@ -205,15 +205,27 @@ def get_ical_for_modules(modules):
     timetable = events.json()
     ical = Calendar()
     for module in timetable:
-        m = " ".join(module["Name"].split(" ")[1:])
+        m = " ".join(module["Name"].split(" ")[:-1])
         for event in module["CategoryEvents"]:
+            name = m + ": " + event["EventType"]
+            if len(list(filter(lambda ev: ev.location == event["Location"]
+                    and ev.name == name
+                    and ev.begin == datetime.fromisoformat(event["StartDateTime"]), ical.events))) > 0:
+                print("Duplicate event! " + name + " at " + event["StartDateTime"])
+                continue
+            if "CSC318_A/PC Lab/01/02" in event["Name"]:
+                print("Ignoring friday lab")
+                continue
+            if "CSC368_CSCM68_A/PC Lab/01/02" in event["Name"]:
+                print("Ignoring wednesday afternoon embedded lab")
+                continue
             desc = event["Name"]
             if len(event["ExtraProperties"]) > 1:
                 desc += " happens on weeks " + event["ExtraProperties"][1]["Value"]
             url = ""
             if len(event["ExtraProperties"]) > 2:
                 url = event["ExtraProperties"][2]["Value"]
-            ev = Event(name=m + ": " + event["EventType"],
+            ev = Event(name=name,
                 description=desc,
                 location=event["Location"],
                 begin=datetime.fromisoformat(event["StartDateTime"]),
