@@ -1,0 +1,12 @@
+[Unit]
+Description=Crappy SU open timetable to ICS thing
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env python3 main.py run
+Restart=on-failure
+WorkingDirectory=/srv/SUOpenTimetable
+
+[Install]
+WantedBy=multi-user.target
+~
