@@ -28,14 +28,35 @@ def index():
 <body>
 
 <h2>MyTimetable to Open Timetable converter</h2>
-<p>This form takes a link to a My Timetable iCal file which you can get by going to https://mytimetable.swansea.ac.uk<br>
-and returns an equivalent link you can use which will fetch the data from Open Timetable instead, as apparently<br>
-that's what we /have/ to use. The MyTimetable link is only used to figure out what modules you take, you should check<br>
-that all of your modules are in the returned URL and add them manually if not - or if they don't match the format<br>
-Open Timetable uses for them.</p>
+<p>This form takes a link to a My Timetable iCal file which you can get by going to https://mytimetable.swansea.ac.uk,<br>
+going to the download button on the top right and clicking the "more" dropdown.<br>
+It returns an equivalent link you can use which will fetch the data from Open Timetable instead, as apparently<br>
+university management think we should spend minutes every day hunting for our modules to see where we need to be<br>
+instead of letting us get one with our studies.<br>
+The MyTimetable link is only used to figure out what modules you take and to filter out the labs for csc368 and csc318.<br></p>
 
+<h3>Ensuring the URL is correct</h3>
+<p>You should check that all your modules are in the returned URL and add them manually if they're missing for some reason.<br>
+The string "%3B" is used as the list separator (HTML quoting for the ';' character).<br>
+also ensure that the lab settings are correct for the lab you're assigned to, they should be blank if you don't take the lab<br>
+For csc368 it can be "morning" or "afternoon", for csc318 either "wednesday" or "friday".<br></p>
+
+<h3>Importing to Google Calender</h3>
+<p>This only works on desktop for some reason. Go to Google Calendar, click the "+" next to the "other calendars" header<br>
+on the left sidebar and click "From URL", paste the URL you get after clicking Submit on this form.<br>
+Once the calendar is added you can click on it to change the name to something sensible.<br>
+It may take a few minutes for the calendar to appear, please wait at least half an hour before attempting to import it again.<br><p>
+
+<h3>Source code and Reliability</h3>
+<p>The ugly source code for this tool is available on GitHub: https://github.com/calebccff/SUOpenTimetableICS<br>
+Do not rely on this to be up to date, you will need to manually go through this process again after Christmas<br>
+to get your new modules. I will needto manually update the hardcoded module filters too. Google Calendar syncs<br>
+roughly once per day, therefore last minute changes are unlikely to be reflected in your calendar.<br><br>
+
+PRs welcome!<br><p>
+
+<h3>Enter MyTimetable iCal Link</h3>
 <form action="/api/generate">
-  <label for="ical">MyTimetable iCal link</label><br>
   <input type="text" id="ical" name="ical" value=""><br>
   <!--
   <p>CSC368 Embedded Lab time</p><br>
