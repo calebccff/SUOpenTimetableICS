@@ -213,13 +213,13 @@ def get_ical_for_modules(modules, csc368_lab_remove, cscs318_lab_remove):
             if len(list(filter(lambda ev: ev.location == event["Location"]
                     and ev.name == name
                     and ev.begin == datetime.fromisoformat(event["StartDateTime"]), ical.events))) > 0:
-                print("Duplicate event! " + name + " at " + event["StartDateTime"])
+                #print("Duplicate event! " + name + " at " + event["StartDateTime"])
                 continue
             if csc368_lab_remove and "CSC368_CSCM68_A/PC Lab/01/0" + csc368_lab_remove in event["Name"]:
-                print(f"Removing embedded lab /0{csc368_lab_remove}")
+                #print(f"Removing embedded lab /0{csc368_lab_remove}")
                 continue
             if cscs318_lab_remove and "CSC318_A/PC Lab/01/0" + cscs318_lab_remove in event["Name"]:
-                print(f"Removing cryptography lab /0{cscs318_lab_remove}")
+                #print(f"Removing cryptography lab /0{cscs318_lab_remove}")
                 continue
             desc = event["Name"]
             if len(event["ExtraProperties"]) > 1:
