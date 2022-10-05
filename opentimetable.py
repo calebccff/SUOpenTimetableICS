@@ -174,7 +174,7 @@ def module_search(module):
             return resp.status_code
     resp = resp.json()
 
-    print(resp)
+    #print(resp)
 
     m = resp["Results"][0]
     return {"name": m["Name"], "id": m["Identity"], "category": m["CategoryTypeIdentity"]}
