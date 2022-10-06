@@ -12,7 +12,7 @@ import os
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-CORS(app)
+#CORS(app)
 
 DOMAIN = "calebs.dev"
 headers = {'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36',
@@ -93,7 +93,7 @@ PRs welcome!<br><p>
 def generate():
     mytimetable_link = ""
     try:
-        mytimetable_link = urlparse(request.args.get('ical')).path
+        mytimetable_link = quote(urlparse(request.args.get('ical')).path)
     except Exception as e:
         print("Failed to parse URL!")
         return f"Invalid URL\""
@@ -104,13 +104,11 @@ def generate():
 
     print(f"Requesting timetable: {url}")
 
-    resp = 0
-    for i in range(5):
+    try:
         timetable = requests.get(url, headers=headers)
-        if timetable.status_code == 200:
-            break
-        print(timetable.text)
-        sleep(0.5)
+    except Exception as e:
+        print(e)
+        return "Couldn't get timetable, try again?"
 
     if timetable.status_code != 200:
         return f"Failed to get timetable: {timetable.status_code}"
